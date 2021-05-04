@@ -1,5 +1,7 @@
 package com.stackroute.filter;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.springframework.web.filter.GenericFilterBean;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -27,26 +29,34 @@ public class JwtFilter extends GenericFilterBean {
             response.setStatus(HttpServletResponse.SC_OK);
             filterChain.doFilter(request, response);
         } else {
+
             /*
              * Check if authHeader is null or does not start with "Bearer " then throw Exception
              */
-
+                if(authHeader==null || !authHeader.startsWith("Bearer")){
+                    throw new ServletException("Error in JwtFilter");
+                }
             /*
              * Extract token from authHeader
              */
 
+            final String token = authHeader.substring(7);
+
+
+
+
             /*
              * Obtain Claims by parsing the token with the signing key value "secret"
              */
-
+            Claims claims= Jwts.parser().setSigningKey("secret").parseClaimsJws(token).getBody();
             /*
              * Set Claims object obtained in previous step with key "claims" as request attribute
              */
-
+            request.setAttribute("claims",claims);
             /*
              * Set user id passed as request parameter with key "user" as request attribute
              */
-
+            request.setAttribute("app",servletRequest.getParameter("id"));
 
             filterChain.doFilter(request, response);
         }

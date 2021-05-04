@@ -1,9 +1,12 @@
 package com.stackroute.config;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.stackroute.domain.User;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +35,11 @@ public class JWTTokenGeneratorImpl implements JWTTokenGenerator {
         /*
          * Generate JWT token and store in String jwtToken
          */
-        
+        jwtToken = Jwts.builder().setSubject(user.getId()).setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256,secret).compact();
+        Map<String ,String > jwtTokenMap = new HashMap<>();
+        jwtTokenMap.put("token",jwtToken);
+        jwtTokenMap.put("message",message);
+
         return jwtTokenMap;
     }
 }
